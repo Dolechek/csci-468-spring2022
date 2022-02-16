@@ -37,28 +37,26 @@ public class CatScriptTokenizer {
         }
         scanSyntax();
     }
-
+    /* ==== COMPLETED ==== */
     private boolean scanString() {
         // TODO implement string scanning here!
         if (matchAndConsume('\"')){
+            // create StringBuffer
             StringBuffer strb = new StringBuffer();
+            // Set postion
             int start = postion;
+            // check for !tokenizationEnd()
+            // if not !tokenEnd then peek()
             while(!tokenizationEnd() && peek() != '\"'){
-                //TODO ASK Carson or Matteo about why the first matchAndConsume
-                // works for passing escapedStrings() & when removed
-                // it doesn't work.
-                matchAndConsume('\\');
-                if(matchAndConsume('\\')){
+                // if match&consume then append if EOF kick out.
+                if(matchAndConsume('\\') && !tokenizationEnd()){
                     strb.append(takeChar());
-//                    takeChar();
                 } else if(!tokenizationEnd()){
                     strb.append(takeChar());
-//                    takeChar();
                 }
             }
-            //first I need to check if i'm in the error state
-            // add error token
-            //else consume closing quote.
+            // if Match & Consume then add token
+            // if no Match & consume then flag error
             if(matchAndConsume(('\"'))){
                 tokenList.addToken(STRING, strb.toString(), start, postion, line, lineOffset);
             } else {
@@ -100,12 +98,13 @@ public class CatScriptTokenizer {
             return false;
         }
     }
-    // TODO: COMPLETED
+    /* ==== COMPLETED ==== */
     private void scanSyntax() {
         // TODO - implement rest of syntax scanning
         //      - implement comments
-        //      - COMPLETED
+        // set postion
         int start = postion;
+        /*all the logic to check for all the syntax*/
         if(matchAndConsume('+')) {
             tokenList.addToken(PLUS, "+", start, postion, line, lineOffset);
         } else if(matchAndConsume('-')) {
@@ -166,19 +165,19 @@ public class CatScriptTokenizer {
             tokenList.addToken(ERROR, "<Unexpected Token: [" + takeChar() + "]>", start, postion, line, lineOffset);
         }
     }
-    //TODO: COMPLETED
+    /* ==== COMPLETED ==== */
     private void consumeWhitespace() {
         // TODO update line and lineOffsets
         while (!tokenizationEnd()) {
             char c = peek();
             if (c == ' ' || c == '\r' || c == '\t') {
-                lineOffset++;
-                postion++;
+                lineOffset++; // increment lineOffset
+                postion++; // increment postion
                 continue;
             } else if (c == '\n') {
-                line++;
-                lineOffset=0;
-                postion++;
+                line++; // increment line
+                lineOffset=0; // set lineOffset to 0
+                postion++; // increment postion
                 continue;
             }
             break;
