@@ -89,7 +89,9 @@ public class CatScriptParser {
     private Expression parseExpression() {
         return parseEqualityExpression();
     }
-
+    // highest in the logic tree
+    // uses ComparisonExpression from below.
+    // all logic trickles down from here and recursively works its way up
     private Expression parseEqualityExpression() {
         Expression expression = parseComparisonExpression();
         while (tokens.match(BANG_EQUAL, EQUAL_EQUAL)) {
@@ -102,6 +104,8 @@ public class CatScriptParser {
         }
         return expression;
     }
+    // fifth in the logic tree
+    // uses AdditiveExpression below
     private Expression parseComparisonExpression() {
         Expression expression = parseAdditiveExpression();
         while (tokens.match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
@@ -114,7 +118,8 @@ public class CatScriptParser {
         }
         return expression;
     }
-
+    // fourth in the logic tree
+    // uses FactorExpression below
     private Expression parseAdditiveExpression() {
         Expression expression = parseFactorExpression();
         while (tokens.match(PLUS, MINUS)) {
@@ -127,7 +132,8 @@ public class CatScriptParser {
         }
         return expression;
     }
-
+    // third in the logic tree for parsing
+    // uses UnaryExpression from below
     private Expression parseFactorExpression() {
         Expression expression = parseUnaryExpression();
         while(tokens.match(SLASH, STAR)){
@@ -140,7 +146,7 @@ public class CatScriptParser {
         }
         return expression;
     }
-
+    // second in the bottom of the logic tree for parsing
     private Expression parseUnaryExpression() {
         if (tokens.match(MINUS, NOT)) {
             Token operator = tokens.consumeToken();
@@ -153,7 +159,7 @@ public class CatScriptParser {
             return parsePrimaryExpression();
         }
     }
-
+    // bottom of the logic tree for parsing
     private Expression parsePrimaryExpression() {
         if (tokens.match(INTEGER)) {
             Token integerToken = tokens.consumeToken();
@@ -165,6 +171,11 @@ public class CatScriptParser {
             StringLiteralExpression stringExpression = new StringLiteralExpression(stringToken.getStringValue());
             stringExpression.setToken(stringToken);
             return stringExpression;
+        /*Handles test cases
+        * parseIdentifierExpression()
+        * parseFunctionCallExpression()
+        * parseNoArgFunctionCallExpression()
+        * parseUnterminatedFunctionCallExpression()*/
         } else if (tokens.match(IDENTIFIER)) {
             // the following three lines handle parseIdentifierExpression() test case
             // returns identifier Expression at the bottom.
@@ -203,45 +214,49 @@ public class CatScriptParser {
                 return fcExpression;
             }
             return identifierExpression;
-        } else if (tokens.match(TRUE)) {
+        } else if (tokens.match(TRUE)) { // handles parseTrueExpression() test case
             Token booToken = tokens.consumeToken();
             BooleanLiteralExpression booExpression = new BooleanLiteralExpression(true);
             booExpression.setToken(booToken);
             return booExpression;
-        } else if (tokens.match(FALSE)) {
+        } else if (tokens.match(FALSE)) { // handles parseFalseExpression() test case
             Token booToken = tokens.consumeToken();
             BooleanLiteralExpression booExpression = new BooleanLiteralExpression(false);
             booExpression.setToken(booToken);
             return booExpression;
-        } else if (tokens.match(NULL)) {
+        } else if (tokens.match(NULL)) { // handles parseNullExpression() test case
             Token nullToken = tokens.consumeToken();
             NullLiteralExpression nullExpression = new NullLiteralExpression();
             nullExpression.setToken(nullToken);
             return nullExpression;
+        /* the below else if statement handles test cases
+        * parseListLiteralExpression()
+        * parseEmptyListLiteralExpression()
+        * parseUnterminatedListLiteralExpression()*/
         } else if (tokens.match(LEFT_BRACKET)) {
-            Token llToken = tokens.consumeToken();
-            List<Expression> listExpression = new LinkedList<>();
-            ErrorType error = null;
-            while (!tokens.match(RIGHT_BRACKET)) {
-                if (tokens.matchAndConsume(COMMA)) {
+            Token llToken = tokens.consumeToken(); // list literal variable
+            List<Expression> listExpression = new LinkedList<>(); // linked list for listExpressions
+            ErrorType error = null; // error variable placeholder to handle unterminated/empty
+            while (!tokens.match(RIGHT_BRACKET)) { // as long as the end bracket isn't hit, continue looping
+                if (tokens.matchAndConsume(COMMA)) { // consume commas & continue
                     continue;
-                } else if(tokens.match(EOF)){
+                } else if(tokens.match(EOF)){ // END OF FILE get correct errortype & break out
                     error = (ErrorType.UNTERMINATED_LIST);
                     break;
-                } else {
+                } else { // parse expressions if above conditions aren't met and add them to linked list
                     Expression expression = parseExpression();
                     listExpression.add(expression);
                 }
             }
             ListLiteralExpression llExpression = new ListLiteralExpression(listExpression);
-            llExpression.setStart(llToken);
-            llExpression.setEnd(tokens.getCurrentToken());
-            tokens.matchAndConsume(RIGHT_BRACKET);
-            if(error != null){
+            llExpression.setStart(llToken); // set start | handles out of bounds issues
+            llExpression.setEnd(tokens.getCurrentToken()); // set end | handles out of bounds issues
+            tokens.matchAndConsume(RIGHT_BRACKET); // consume right bracket after all above logic is finished
+            if(error != null){ // error handle if value is no longer null
                 llExpression.addError(error);
             }
             return llExpression;
-        } else if (tokens.match(LEFT_PAREN)) {
+        } else if (tokens.match(LEFT_PAREN)) { // handles additiveExpressionsCanBeParenthesized() test
             Token operator = tokens.consumeToken();
             StringLiteralExpression stringExpression = new StringLiteralExpression(operator.getStringValue());
             return new ParenthesizedExpression(stringExpression);
