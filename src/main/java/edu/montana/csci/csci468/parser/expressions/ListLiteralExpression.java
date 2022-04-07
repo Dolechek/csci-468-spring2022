@@ -29,7 +29,21 @@ public class ListLiteralExpression extends Expression {
             value.validate(symbolTable);
         }
         if (values.size() > 0) {
-            // TODO - generalize this looking at all objects in list
+            // inferred type set to NULL since we can assign NULL to anything.
+            CatscriptType inferType = CatscriptType.NULL;
+            for (Expression value : values) {
+                // get the value of the componenentType
+                CatscriptType componentType = value.getType();
+                // not assignable to the NULL type.
+                if (!inferType.isAssignableFrom(componentType)) {
+                    if (inferType == CatscriptType.NULL) {
+                        inferType = componentType;
+                    } else {
+                        inferType = CatscriptType.OBJECT;
+                    }
+                }
+            }
+            // TODO: unsure about this bottom logic
             type = CatscriptType.getListType(values.get(0).getType());
         } else {
             type = CatscriptType.getListType(CatscriptType.OBJECT);
@@ -47,7 +61,12 @@ public class ListLiteralExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
-        return super.evaluate(runtime);
+        // passess literalExpressionsEvaluatesProperly() test
+        LinkedList list = new LinkedList();
+        for (Expression value : values) {
+            list.add(value.evaluate(runtime));
+        }
+        return list;
     }
 
     @Override

@@ -42,5 +42,4 @@ public class CatscriptRuntime {
     public void popScope() {
         scopes.pop();
     }
-
 }

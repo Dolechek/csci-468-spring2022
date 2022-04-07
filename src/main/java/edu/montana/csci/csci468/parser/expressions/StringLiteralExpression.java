@@ -5,6 +5,8 @@ import edu.montana.csci.csci468.eval.CatscriptRuntime;
 import edu.montana.csci.csci468.parser.CatscriptType;
 import edu.montana.csci.csci468.parser.SymbolTable;
 
+import java.util.Objects;
+
 public class StringLiteralExpression extends Expression {
     private final String stringValue;
 
@@ -30,7 +32,7 @@ public class StringLiteralExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
-        return super.evaluate(runtime);
+        return stringValue;
     }
 
     @Override
