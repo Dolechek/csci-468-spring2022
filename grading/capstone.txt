@@ -1,0 +1,4 @@
+Errors:
+
+- Missing source zip
+- Missing logan_dolechek_portfolio.pdf
