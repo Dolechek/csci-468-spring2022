@@ -9,6 +9,7 @@ import edu.montana.csci.csci468.tokenizer.TokenType;
 
 import javax.xml.namespace.QName;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +22,6 @@ public class CatScriptParser {
 
     public CatScriptProgram parse(String source) {
         tokens = new CatScriptTokenizer(source).getTokens();
-
         // first parse an expression
         CatScriptProgram program = new CatScriptProgram();
         program.setStart(tokens.getCurrentToken());
@@ -41,8 +41,8 @@ public class CatScriptParser {
         }
         program.setEnd(tokens.getCurrentToken());
         return program;
-    }
 
+    }
     public CatScriptProgram parseAsExpression(String source) {
         tokens = new CatScriptTokenizer(source).getTokens();
         CatScriptProgram program = new CatScriptProgram();
@@ -175,6 +175,7 @@ public class CatScriptParser {
             return null;
         }
     }
+
     // ==== DONE ====
     private FunctionDefinitionStatement parseFunctionDefinition() {
         if (tokens.match(FUNCTION)) {

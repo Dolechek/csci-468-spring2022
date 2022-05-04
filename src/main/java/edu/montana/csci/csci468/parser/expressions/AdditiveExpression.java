@@ -44,7 +44,6 @@ public class AdditiveExpression extends Expression {
                 rightHandSide.addError(ErrorType.INCOMPATIBLE_TYPES);
             }
         }
-        // TODO handle strings
     }
 
     @Override

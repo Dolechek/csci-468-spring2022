@@ -33,19 +33,24 @@ public class CatscriptType {
         return false;
     }
 
-    // TODO memoize this call
-    // create a cache so we aren't new-up'ing a ListType.
-    // TODO: CARSON WENT OVER THIS BREIFLY IN MONDAY LECTURE 4/4/22
+    // Memoization
+    // not a thread safe implementation - alright for the purpose of Catscript
     private static Map<CatscriptType, ListType> cache = new HashMap();
     public static CatscriptType getListType(CatscriptType type) {
-        /*ListType listType = cache.get(type);
+        // getting the current type.
+        ListType listType = cache.get(type);
+        // if there is a current type stored, then return that type.
         if (listType != null) {
             return  listType;
-        } else {
-            ListType hasListType = new ListType(listType);
-            return new ListType(hasListType);
-        }*/
-        return new ListType(type);
+        }
+        /* If there is no current type stored, then put the new type in the map
+        * the key being type and the value stored being hasListType*/
+        else {
+            ListType hasListType = new ListType(type);
+            cache.put(type, hasListType);
+            return hasListType;
+            //return new ListType(hasListType);
+        }
     }
 
     @Override

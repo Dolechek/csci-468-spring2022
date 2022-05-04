@@ -43,7 +43,6 @@ public class ListLiteralExpression extends Expression {
                     }
                 }
             }
-            // TODO: unsure about this bottom logic
             type = CatscriptType.getListType(values.get(0).getType());
         } else {
             type = CatscriptType.getListType(CatscriptType.OBJECT);
